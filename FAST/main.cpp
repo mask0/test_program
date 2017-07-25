@@ -9,16 +9,31 @@ using namespace cv;
 using namespace std;
 
 int main(int argc, char **argv){
-    Mat input_image =imread("lena.png");
+  //camera open
+  VideoCapture cap("video.avi");  
+  cap.open(1);
+  if (!cap.isOpened()) {
+    std::cout << "cannot find a camera." << std::endl;
+    waitKey(5000);
+    return -1;
+  }
+
+  Mat frame;
+  while(1){
+    cap >> frame;
     vector<KeyPoint> points;
     Ptr < FastFeatureDetector>fast = FastFeatureDetector::create();
-    fast->detect(input_image, points);
+    fast->detect(frame, points);
 
     Mat image_fast;
-    drawKeypoints(input_image, points, image_fast, Scalar(0, 0, 255));
+    drawKeypoints(frame, points, image_fast, Scalar(0, 0, 255));
     imshow("fast", image_fast);
-    waitKey(0);
-    destroyAllWindows();
 
-    return 0;
+    int key = waitKey(30);
+    if(key == 1048689){
+      break;
+    }
+  }
+  destroyAllWindows();
+  return 0;
 }
