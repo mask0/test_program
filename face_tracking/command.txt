@@ -1,1 +1,1 @@
-./main lenna.png /usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_alt.xml
+./main imput.png /usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_alt.xml
