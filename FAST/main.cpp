@@ -29,8 +29,8 @@ int main(int argc, char **argv){
     drawKeypoints(frame, points, image_fast, Scalar(0, 0, 255));
     imshow("fast", image_fast);
 
-    int key = waitKey(30);
-    if(key == 1048689){
+    int key = waitKey(1);
+    if(key == 113){
       break;
     }
   }
