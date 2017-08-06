@@ -56,9 +56,5 @@ int main(int argc, char **argv){
   imshow("match",dest);
   
   waitKey(0);
-  //Ptr<FeatureDetector> detector = FeatureDetector::create("SIFT");
-
-
-  //detector->detect(image, sift_keypoint);
   return 0;
 }
