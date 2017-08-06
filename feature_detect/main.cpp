@@ -54,7 +54,13 @@ int main(int argc, char **argv){
   Mat dest;
   drawMatches(image, sift_keypoint1, clone, sift_keypoint2, match12, dest);
   imshow("match",dest);
-  
+
+  imwrite("FAST.png", fast_image);
+  imwrite("SIFT.png", sift_image);
+  imwrite("SURF.png", surf_image);
+  imwrite("AKAZE.png", akaze_image);
+  imwrite("match.png", dest);
+
   waitKey(0);
   return 0;
 }
