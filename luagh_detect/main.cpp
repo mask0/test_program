@@ -21,6 +21,7 @@ int main(int argc, char **argv){
   
   Mat frame, result, img_dst;
 
+  //template image file name.
   vector<string> file_tmp;
   file_tmp.push_back("right_eye.png");
   file_tmp.push_back("left_eye.png");
@@ -30,6 +31,7 @@ int main(int argc, char **argv){
   Mat img_tmp[N];
   Point max_pt[N];
 
+  //Reading template image
   for(int i = 0; i < N; i++){
     img_tmp[i] = imread(file_tmp[i], 1);
     }
@@ -38,6 +40,7 @@ int main(int argc, char **argv){
     cap >> frame;
     img_dst = frame.clone();
 
+    //draw rectangle for template matching
     for(int i =0; i<N; i++){
       matchTemplate(frame, img_tmp[i], result, TM_CCORR_NORMED);
       minMaxLoc(result, NULL, NULL, NULL, &max_pt[i]);
@@ -45,9 +48,11 @@ int main(int argc, char **argv){
       rectangle(img_dst, r.tl(), r.br(), Scalar(255, 0, 255), 2);
     }
 
+    //draw rectangle for face
     Rect r(max_pt[0].x + img_tmp[0].rows/2, max_pt[0].y + img_tmp[0].cols/2, max_pt[1].x-max_pt[0].x, max_pt[3].y-max_pt[0].y);
     rectangle(img_dst, r.tl(), r.br(), Scalar(255, 255, 255), 2);
 
+    //calculate degree of smile.
     double width = saturate_cast<double>(max_pt[1].x - max_pt[0].x);
     double height = saturate_cast<double>(max_pt[3].y - max_pt[0].y);
     double ratio = width / height;
