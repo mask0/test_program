@@ -23,7 +23,7 @@ int main(int argc, char **argv){
   Ptr<xfeatures2d::SURF>detectorSURF = xfeatures2d::SURF::create();
   Ptr<AKAZE> detectorAKAZE = AKAZE::create();
 
-  vector<KeyPoint> fast_keypoint, sift_keypoint, surf_keypoint, akaze_keypoint, sift_keypoint1, sift_keypoint2;
+  vector<KeyPoint> fast_keypoint, sift_keypoint, surf_keypoint, akaze_keypoint;
   detectorFAST->detect(image, fast_keypoint);
   detectorSIFT->detect(image, sift_keypoint);
   detectorSURF->detect(image, surf_keypoint);
@@ -41,25 +41,26 @@ int main(int argc, char **argv){
 
 
   /*------------ matching_sample(sift) -----------------*/
+  vector<KeyPoint> sift_keypoint1, sift_keypoint2;
   detectorSIFT->detect(image, sift_keypoint1);
   detectorSIFT->detect(image, sift_keypoint2);
-  Mat descriptor1, descriptor2;
-  detectorSIFT->compute(image, sift_keypoint1, descriptor1);
-  detectorSIFT->compute(clone, sift_keypoint2, descriptor2);
+  Mat sift_descriptor1, sift_descriptor2;
+  detectorSIFT->compute(image, sift_keypoint1, sift_descriptor1);
+  detectorSIFT->compute(clone, sift_keypoint2, sift_descriptor2);
 
   Ptr<DescriptorMatcher> sift_matcher = DescriptorMatcher::create("BruteForce");
-  vector<DMatch> match, match12, match21;
-  sift_matcher->match(descriptor1, descriptor2, match12);
+  vector<DMatch> sift_match;
+  sift_matcher->match(sift_descriptor1, sift_descriptor2, sift_match);
   
-  Mat dest;
-  drawMatches(image, sift_keypoint1, clone, sift_keypoint2, match12, dest);
-  imshow("match",dest);
+  Mat sift_dst;
+  drawMatches(image, sift_keypoint1, clone, sift_keypoint2, sift_match, sift_dst);
+  imshow("sift_match", sift_dst);
 
   imwrite("FAST.png", fast_image);
   imwrite("SIFT.png", sift_image);
   imwrite("SURF.png", surf_image);
   imwrite("AKAZE.png", akaze_image);
-  imwrite("match.png", dest);
+  imwrite("match.png", sift_dst);
 
   waitKey(0);
   return 0;
