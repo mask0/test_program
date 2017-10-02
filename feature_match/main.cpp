@@ -13,35 +13,17 @@ using namespace std;
 
 int main(int argc, char **argv){
   Mat image = imread(argv[1]);
-  Mat clone = image.clone();
-  Mat gray_image, img_threshold;  
-  cvtColor(image, gray_image, CV_BGR2GRAY);
-  threshold(gray_image, img_threshold, 0, 255, THRESH_BINARY | THRESH_OTSU);
   
   Ptr<FastFeatureDetector> detectorFAST = FastFeatureDetector::create();
   Ptr<xfeatures2d::SIFT>detectorSIFT = xfeatures2d::SIFT::create();
 
-  vector<KeyPoint> fast_keypoint, sift_keypoint;
-  detectorFAST->detect(gray_image, fast_keypoint);
-  detectorSIFT->detect(gray_image, sift_keypoint);
+  vector<KeyPoint> fast_keypoint1, fast_keypoint2;
+  Mat fast_descriptor1, fast_descriptor2;
 
-  Mat fast_image,sift_image, surf_image, akaze_image;
-  drawKeypoints(gray_image, fast_keypoint, fast_image, Scalar(0, 255, 0), DrawMatchesFlags::DEFAULT);
-  drawKeypoints(gray_image, sift_keypoint, sift_image, Scalar(0, 255, 0), DrawMatchesFlags::DEFAULT);
+  detectorFAST->detect(image, fast_keypoint1);
+  detectorSIFT->compute(image, fast_keypoint1, fast_descriptor1);
 
-  imshow("FAST", fast_image);
-  imshow("SIFT", sift_image);
-  //imwrite("FAST.png", fast_image);
-  //imwrite("SIFT.png", sift_image);
-
-  /*------------ matching_sample(sift) -----------------*/
-  vector<KeyPoint> sift_keypoint1, sift_keypoint2;
-  detectorSIFT->detect(image, sift_keypoint1);
-
-  Mat sift_descriptor1, sift_descriptor2;
-  detectorSIFT->compute(image, sift_keypoint1, sift_descriptor1);
-
-    //camera open
+  //camera open
   VideoCapture cap("video.avi");  
   cap.open(1);
   if (!cap.isOpened()) {
@@ -50,23 +32,22 @@ int main(int argc, char **argv){
     return -1;
   }
 
-  Mat camera, gray_camera;
+  Mat camera;
   while(1){
     cap >> camera;
-      cvtColor(camera, gray_camera, CV_BGR2GRAY);
-      detectorSIFT->detect(gray_camera, sift_keypoint2);
-      detectorSIFT->compute(gray_camera, sift_keypoint2, sift_descriptor2);
+      detectorFAST->detect(camera, fast_keypoint2);
+      detectorSIFT->compute(camera, fast_keypoint2, fast_descriptor2);
 
-      Ptr<DescriptorMatcher> sift_matcher = DescriptorMatcher::create("BruteForce");
-      vector<DMatch> sift_match;
-      sift_matcher->match(sift_descriptor1, sift_descriptor2, sift_match);
+      Ptr<DescriptorMatcher> fast_matcher = DescriptorMatcher::create("BruteForce");
+      //vector<DMatch> fast_match;
+      //fast_matcher->match(fast_descriptor1, fast_descriptor2, fast_match);
 
-      //vector<vector<DMatch> > sift_match2;
-      //sift_matcher->match(sift_descriptor1, sift_descriptor2, sift_match2, 2);
+      vector<vector<DMatch> > fast_match;
+      fast_matcher->knnMatch(fast_descriptor1, fast_descriptor2, fast_match, 1);
       
-      Mat sift_dst;
-      drawMatches(gray_image, sift_keypoint1, gray_camera, sift_keypoint2, sift_match, sift_dst);
-      imshow("sift_match", sift_dst);
+      Mat fast_dst;
+      drawMatches(image, fast_keypoint1, camera, fast_keypoint2, fast_match, fast_dst);
+      imshow("fast_match", fast_dst);
 
       int key = waitKey(1);
       if(key == 113){ break;}   
