@@ -39,7 +39,8 @@ int main(int argc, char **argv){
   while(1){
     cap >> frame;
     img_dst = frame.clone();
-
+    imwrite("frame.png", frame);
+    
     //draw rectangle for template matching
     for(int i =0; i<N; i++){
       matchTemplate(frame, img_tmp[i], result, TM_CCORR_NORMED);
@@ -61,7 +62,7 @@ int main(int argc, char **argv){
     putText(img_dst, format("%5.3lf", ratio), Point(50, 50), FONT_HERSHEY_SIMPLEX, 1.0, Scalar(0, 0, 255), 2, LINE_AA);
 
     imshow("frame", img_dst);
-
+    imwrite("result.png", img_dst);
 
     int key = waitKey(1);
     if(key == 113){
